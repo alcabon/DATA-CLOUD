@@ -337,8 +337,49 @@ Puisque le Data Space est virtuel, sa localisation physique est en réalité **l
 Souhaitez-vous que nous abordions **un cas d'usage pratique justifiant la création de plusieurs Data Spaces** (par exemple, la séparation entre une activité B2B et B2C), ou préférez-vous que nous reprenions notre exploration sur **les méthodes d'Activation de vos segments** vers l'extérieur ?
 
 ---
----
 
 Maintenant que vous avez créé cette audience hyper-ciblée, la prochaine étape logique est de l'utiliser.
 
 Souhaitez-vous que nous explorions **les "Activations" (comment envoyer ce segment vers Marketing Cloud ou Facebook Ads)**, ou préférez-vous voir comment utiliser les **"Data Actions" pour alerter un commercial dans Sales Cloud en temps réel** lorsqu'un client entre dans ce segment ?
+
+---
+
+C'est une excellente question, car la notion de **Data Space** (Espace de données) est souvent source de confusion. On a tendance à imaginer qu'il s'agit de bases de données physiquement séparées, ce qui n'est pas le cas.
+
+Pour faire simple : un Data Space est une **frontière logique** (virtuelle), pas une frontière physique.
+
+Voici exactement ce qu'il contient et où il se trouve.
+
+---
+
+### 1. Que contient un Data Space ? (Le contenu logique)
+
+Imaginez Data Cloud comme un grand immeuble de bureaux appartenant à votre entreprise. Les Data Spaces sont les différents étages sécurisés de cet immeuble.
+
+Un Data Space agit comme un mini-Data Cloud autonome. À l'intérieur d'un Data Space spécifique (par exemple, un espace nommé "Europe" ou "Marque A"), vous allez retrouver **tous les éléments constitutifs que nous avons vus précédemment, isolés des autres espaces** :
+
+* **Ses propres flux de données (Data Streams) :** Les connexions spécifiques à cet espace.
+* **Ses propres données brutes et harmonisées (DLO et DMO) :** Les données du site web européen n'iront que dans le Data Space "Europe".
+* **Ses propres règles d'Identity Resolution :** Vous pouvez avoir des règles de dédoublonnage différentes selon la marque ou la région.
+* **Ses propres Profils Unifiés :** Le client "Jean Dupont" dans le Data Space Europe sera distinct du client "Jean Dupont" dans le Data Space Asie.
+* **Ses propres Segments et Insights :** Les marketeurs assignés à cet espace ne verront et ne pourront utiliser que les données de cet espace.
+
+**Le but principal ? La gouvernance et la sécurité.** Cela permet de s'assurer qu'un marketeur de votre filiale française n'ait pas accès aux données clients de votre filiale américaine (crucial pour le RGPD), tout en payant et en gérant une seule instance Data Cloud globale.
+
+---
+
+### 2. Où est localisé le Data Space ? (La localisation physique)
+
+Puisque le Data Space est virtuel, sa localisation physique est en réalité **la localisation de votre instance Data Cloud globale**.
+
+* **L'infrastructure sous-jacente (Hyperforce) :** Data Cloud ne tourne pas sur les anciens serveurs historiques de Salesforce. Il est construit nativement sur **Hyperforce**, qui est l'architecture de nouvelle génération de Salesforce déployée sur le cloud public (principalement Amazon Web Services - AWS).
+* **La résidence des données (Data Residency) :** Lorsque votre entreprise achète Data Cloud, l'instance est provisionnée dans une région géographique spécifique qui correspond généralement à celle de votre organisation Salesforce principale (votre CRM).
+* *Exemple :* Si votre entreprise est française et a demandé un hébergement européen pour des raisons de conformité, vos données Data Cloud (et donc tous vos Data Spaces) seront physiquement stockées et traitées sur des serveurs AWS situés en Europe (par exemple à Francfort ou à Paris).
+
+
+
+> **En résumé :** Vos Data Spaces sont cloisonnés logiquement pour vos utilisateurs, mais physiquement, ils cohabitent dans la même base de données "hyperscale" sécurisée, hébergée sur l'infrastructure cloud publique choisie par votre entreprise lors de l'achat.
+
+---
+
+Souhaitez-vous que nous abordions **un cas d'usage pratique justifiant la création de plusieurs Data Spaces** (par exemple, la séparation entre une activité B2B et B2C), ou préférez-vous que nous reprenions notre exploration sur **les méthodes d'Activation de vos segments** vers l'extérieur ?
