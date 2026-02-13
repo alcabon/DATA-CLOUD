@@ -137,3 +137,61 @@ Si vous venez du monde Data (Data Engineer, Snowflake admin), vous avez un avant
 ---
 
 Pour illustrer comment un profil un peu plus technique peut "casser" cette abstraction volontairement, souhaitez-vous que nous regardions comment utiliser la **Query API** (pour écrire vos propres requêtes SQL complexes directement sur le Data Lake) ou préférez-vous découvrir **Einstein Studio** (pour connecter vos propres modèles de Machine Learning) ?
+
+---
+
+C'est une excellente remarque et c'est une confusion **extrêmement courante** sur le marché ! Vous n'êtes absolument pas le seul à avoir fait ce raccourci, et c'est tout à fait logique au vu de l'histoire de ces plateformes.
+
+Pour vous répondre de manière directe : **Non, Databricks n'appartient pas à Microsoft.** C'est une entreprise totalement indépendante et sa technologie est **globale et multi-cloud**.
+
+Voici pourquoi cette confusion existe et ce qu'est réellement Databricks.
+
+---
+
+### 1. Pourquoi tout le monde pense que c'est du Microsoft ?
+
+La confusion vient d'un coup de génie marketing et technique appelé **Azure Databricks**.
+
+Aux débuts de l'entreprise, Microsoft a senti le potentiel immense de Databricks et a noué un partenariat exclusif très profond. Sur le cloud de Microsoft (Azure), Databricks n'est pas juste un logiciel tiers que l'on installe ; c'est un **service "First-Party"** (intégré nativement).
+
+* Il est vendu directement par Microsoft.
+* Il est intégré à l'interface Azure, à la facturation Azure et à la sécurité Azure (Active Directory).
+
+Cette intégration est si parfaite que beaucoup d'utilisateurs pensent naturellement que c'est un produit "Maison" de Microsoft.
+
+### 2. La réalité : Une plateforme universelle (Multi-Cloud)
+
+En vérité, Databricks est une entreprise fondée par les universitaires de Berkeley qui ont inventé **Apache Spark** (l'un des moteurs de calcul Big Data les plus puissants au monde).
+
+Aujourd'hui, Databricks déploie son architecture "Data Lakehouse" sur les trois géants du cloud public :
+
+* **AWS** (Databricks on AWS)
+* **Microsoft Azure** (Azure Databricks)
+* **Google Cloud Platform** (Databricks on Google Cloud)
+
+Leur force est justement de permettre aux grandes entreprises de ne pas être enfermées chez un seul fournisseur cloud.
+
+### 3. La différence avec Snowflake (L'ADN de l'IA)
+
+Si Snowflake (dont nous parlions) a été construit par des experts en base de données pour disrupter l'entrepôt de données (Data Warehouse) avec une approche très orientée **SQL et Analystes**, Databricks a été construit par des experts en intelligence artificielle pour les **Data Scientists et les Data Engineers**.
+
+* **Snowflake** excelle dans l'analyse de données structurées, la BI (Business Intelligence) et le reporting hyper-rapide.
+* **Databricks** excelle dans le traitement de données non structurées (textes, images), le Machine Learning complexe, et la création de modèles d'Intelligence Artificielle prédictive.
+
+---
+
+### 💡 Le lien avec Salesforce Data Cloud : Le BYOM
+
+C'est là que la boucle se boucle avec notre sujet !
+
+Si Snowflake est souvent utilisé avec Salesforce Data Cloud en *Zero Copy* pour croiser des données transactionnelles, **Databricks est le partenaire star pour l'Intelligence Artificielle**.
+
+Grâce à la fonctionnalité **Einstein Studio** de Salesforce, vous pouvez faire du **BYOM (Bring Your Own Model)** :
+
+1. Vos Data Scientists utilisent la puissance de Databricks pour créer un modèle d'IA ultra-complexe (par exemple : "Prédire quel produit un client va acheter dans les 30 prochains jours en fonction de sa navigation web").
+2. Au lieu d'essayer de recréer ce modèle dans Salesforce, Data Cloud se connecte directement à Databricks.
+3. Salesforce envoie les profils clients à Databricks, le modèle Databricks calcule la prédiction, et le résultat redescend instantanément dans le Profil Unifié de Data Cloud.
+
+---
+
+Souhaitez-vous que nous plongions dans le fonctionnement concret de ce **Bring Your Own Model (BYOM) avec Einstein Studio**, ou préférez-vous que nous repassions du côté de la manipulation des données avec la **Query API (SQL)** ?
