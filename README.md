@@ -60,3 +60,242 @@ J'ai conçu cette image pour qu'elle soit à la fois claire sur le plan conceptu
 * **Sources externes variées :** Des éléments comme le satellite ou les serveurs hérités montrent que Data Cloud connecte *tout*, pas seulement les données Salesforce.
 * **Customer 360 comme résultat :** Le cercle unifié montre comment cette intelligence est distribuée à toutes les équipes (Ventes, Service, etc.) pour une vue cohérente.
 * **Impact dans le monde réel :** La ville en arrière-plan illustre les résultats concrets : des offres personnalisées, des services proactifs et des expériences connectées pour le client final.
+
+---
+
+Voici les éléments constitutifs principaux (les "building blocks") de Salesforce Data Cloud.
+
+Pour bien les comprendre, il est préférable de les classer selon le cycle de vie de la donnée dans la plateforme. J'ai inclus la terminologie en anglais (qui est souvent la norme sur l'interface Salesforce) accompagnée de sa signification en français.
+
+### 1. Organisation et Gouvernance
+
+* **Data Spaces (Espaces de données) :** C'est l'élément que vous avez cité. Il permet de partitionner logiquement vos données, vos métadonnées et vos processus à l'intérieur d'une même instance Data Cloud. C'est indispensable pour séparer les données par marque, par région géographique ou par filiale, afin de respecter la confidentialité et la gouvernance.
+
+### 2. Ingestion des données (Connecter)
+
+* **Data Streams (Flux de données) :** Ce sont les tuyaux d'entrée. Un flux de données connecte une source externe (Salesforce CRM, Marketing Cloud, Amazon S3, Google Cloud Storage, SDK Web/Mobile, API) à Data Cloud pour y déverser les données.
+* **Data Lake Objects / DLO (Objets du lac de données) :** C'est la donnée à l'état brut. Lorsqu'un *Data Stream* ingère des données, elles atterrissent dans Data Cloud sous forme de DLO, exactement dans le même format que la source d'origine.
+
+### 3. Modélisation (Harmoniser)
+
+* **Data Model Objects / DMO (Objets du modèle de données) :** C'est l'étape de standardisation. On prend les données brutes (*DLO*) et on les "mappe" (associe) à un modèle de données standard fourni par Salesforce (le *Customer 360 Data Model*). Par exemple, un "Client" du CRM et un "Acheteur" du site e-commerce deviennent tous deux le DMO standard "Individual" (Individu).
+
+### 4. Résolution d'identité (Unifier)
+
+* **Identity Resolution (Règles de résolution d'identité) :** C'est le moteur de déduplication et de fusion. Il se base sur deux sous-éléments :
+* **Match Rules (Règles de correspondance) :** Les critères pour dire que deux profils sont la même personne (ex: "Correspondance exacte sur l'email" OU "Même nom + Même numéro de téléphone").
+* **Reconciliation Rules (Règles de réconciliation) :** En cas de conflit, quelle donnée garde-t-on ? (ex: "Prendre le numéro de téléphone le plus récent" ou "Garder l'adresse email issue du CRM en priorité").
+
+
+* **Unified Individual (Profil Unifié) :** C'est le résultat direct de l'Identity Resolution. C'est le fameux "Golden Record" ou profil client 360.
+
+### 5. Intelligence et Calculs (Analyser)
+
+* **Calculated Insights (Connaissances calculées) :** Ce sont des métriques multidimensionnelles calculées sur vos données. Au lieu de faire un simple filtre, vous créez des scores ou des agrégats (ex: calcul du CA total par client, valeur à vie du client (CLTV), score de RFM - Récence, Fréquence, Montant).
+* **Streaming Insights (Connaissances en continu) :** Des calculs similaires, mais exécutés en temps quasi-réel sur des flux de données entrants (ex: détecter si un utilisateur clique 3 fois sur la page "Abonnement" dans les 10 dernières minutes).
+
+### 6. Actionnabilité (Agir)
+
+* **Segments :** L'interface de création d'audiences. Vous utilisez le *Profil Unifié* et les *Calculated Insights* pour filtrer votre base (ex: "Femmes de 25-35 ans, vivant à Paris, avec une CLTV > 1000€ et qui ont ouvert un ticket SAV le mois dernier").
+* **Activation Targets (Cibles d'activation) :** La destination où vous allez envoyer votre *Segment*. Cela peut être Salesforce Marketing Cloud, Meta (Facebook Ads), Google Ads, Amazon S3, etc.
+* **Activations :** Le pont entre le *Segment* et la *Cible d'activation*. C'est ici que l'on choisit quelles données précises on envoie (ex: on n'envoie que l'email haché et le prénom à Facebook).
+* **Data Actions (Actions sur les données) :** Un outil d'automatisation qui écoute ce qui se passe dans Data Cloud et déclenche un événement dans Salesforce CRM (via les *Platform Events*) ou via un webhook (ex: si un profil atteint le statut "Risque de désabonnement", on crée automatiquement une tâche pour le commercial dans Sales Cloud).
+
+*Optionnel mais essentiel pour les profils très techniques :*
+
+* **Einstein Studio (BYOM - Bring Your Own Model) :** Permet aux data scientists de connecter leurs propres modèles de Machine Learning (hébergés sur Databricks, Snowflake, SageMaker...) directement aux données de Data Cloud pour faire des prédictions (ex: score de propension d'achat).
+
+---
+
+Un diagramme est en effet le meilleur moyen de visualiser comment tous ces "blocs de construction" interagissent pour transformer une donnée brute en une action concrète.
+
+Voici le schéma de l'architecture et du cycle de vie de la donnée dans Salesforce Data Cloud, représenté via Mermaid :
+
+```mermaid
+graph LR
+    %% Définition des styles
+    classDef source fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px
+    classDef ingest fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px
+    classDef harmonize fill:#e8f5e9,stroke:#43a047,stroke-width:2px
+    classDef unify fill:#fff8e1,stroke:#ffb300,stroke-width:2px
+    classDef analyze fill:#fbe9e7,stroke:#e53935,stroke-width:2px
+    classDef act fill:#e0f7fa,stroke:#00acc1,stroke-width:2px
+    classDef target fill:#eceff1,stroke:#546e7a,stroke-width:2px
+
+    %% Espace de gouvernance global
+    subgraph "Data Space (Gouvernance globale et partitionnement)"
+        
+        %% 1. Ingestion
+        subgraph "1. Connecter"
+            SRC((Sources de<br>Données)):::source --> DS[Data Streams]:::ingest
+            DS --> DLO[(Data Lake<br>Objects - DLO)]:::ingest
+        end
+
+        %% 2. Harmonisation
+        subgraph "2. Harmoniser"
+            DLO -->|Mapping| DMO[Data Model<br>Objects - DMO]:::harmonize
+        end
+
+        %% 3. Unification
+        subgraph "3. Unifier"
+            DMO --> IR{Identity<br>Resolution}:::unify
+            IR -->|Match & Reconcile| UI((Unified<br>Individual)):::unify
+        end
+
+        %% 4. Intelligence
+        subgraph "4. Analyser"
+            DMO -.-> CI[Calculated &<br>Streaming Insights]:::analyze
+            UI -.-> CI
+            DMO -.-> AI[Einstein / BYOM]:::analyze
+        end
+
+        %% 5. Actionnabilité
+        subgraph "5. Agir"
+            UI --> SEG[Segments]:::act
+            CI --> SEG
+            AI --> SEG
+            SEG --> ACT[Activations]:::act
+            
+            UI -.-> DA[Data Actions]:::act
+            CI -.-> DA
+        end
+    end
+
+    %% Sorties externes
+    ACT --> AT[Activation<br>Targets]:::target
+    DA --> PlatEv[Platform Events<br>Webhooks]:::target
+    
+    AT --> Out1((Marketing Cloud,<br>Meta, Google Ads...)):::source
+    PlatEv --> Out2((Salesforce CRM,<br>Systèmes Tiers)):::source
+
+```
+
+### Comment lire ce diagramme :
+
+1. **Le Cadre Global (Data Space) :** Tout se passe à l'intérieur d'un *Data Space*, qui garantit que ces données sont cloisonnées selon vos règles de gouvernance (par exemple : "Espace Europe" vs "Espace US").
+2. **Le Flux Principal (Lignes pleines) :** Vous voyez le parcours classique de la donnée de gauche à droite. La source externe alimente le **Data Stream**, qui stocke la donnée brute dans le **DLO**. Celle-ci est traduite dans le langage standard Salesforce (**DMO**).
+3. **La Magie de l'Unification :** Le DMO passe dans l'entonnoir de l'**Identity Resolution** pour créer le **Profil Unifié (Unified Individual)**.
+4. **L'Enrichissement (Lignes pointillées) :** Les Insights et l'IA (Einstein) viennent enrichir ce profil avec des scores et des calculs.
+5. **L'Action :** Enfin, les profils et les insights nourrissent les **Segments**, qui sont envoyés via les **Activations** vers des cibles externes, ou déclenchent des **Data Actions** en temps réel dans le CRM.
+
+---
+
+Souhaitez-vous que nous plongions dans la configuration technique d'une de ces étapes en particulier (par exemple : **comment configurer les règles de l'Identity Resolution**) ou préférez-vous aborder **les stratégies de segmentation** à partir du profil unifié ?
+
+---
+
+C'est un excellent choix de sujet. L'**Identity Resolution** (Résolution d'Identité) est véritablement le cœur du réacteur de Data Cloud. C'est ici que la magie opère pour transformer des dizaines d'enregistrements fragmentés en un seul "Golden Record".
+
+Pour configurer cela, Data Cloud utilise ce qu'on appelle un **Ruleset** (Ensemble de règles). Ce Ruleset se divise en deux grandes étapes : décider *qui est qui* (Match Rules), puis décider *quelle information garder* en cas de doublon (Reconciliation Rules).
+
+Voici comment configurer ces règles, étape par étape, comme un architecte de données.
+
+---
+
+### 1. Créer le Ruleset (L'Ensemble de règles)
+
+La première étape consiste à créer l'enveloppe qui va contenir vos règles.
+
+* Vous naviguez dans l'onglet **Identity Resolutions** de Data Cloud et cliquez sur **New**.
+* Vous choisissez l'entité principale que vous souhaitez unifier. Dans 99 % des cas, il s'agit de l'entité standard **Individual** (le DMO qui représente une personne physique).
+
+### 2. Configurer les "Match Rules" (Règles de Correspondance)
+
+L'objectif ici est de répondre à la question : **À quelles conditions deux enregistrements différents (ex: un contact CRM et un compte e-commerce) appartiennent-ils à la même personne ?**
+
+Vous allez créer des conditions (qui fonctionnent avec des "OU" logiques). Dès qu'une condition est remplie, Data Cloud fusionne les profils.
+
+Vous disposez de trois méthodes de correspondance pour vos critères :
+
+* **Exact (Exact) :** Les données doivent être strictement identiques. (ex: `Email Exact` = jean.dupont@email.com).
+* **Normalized (Normalisé) :** Data Cloud "nettoie" la donnée avant de comparer. Très utile pour les numéros de téléphone (ex: +33612345678 est considéré identique à 06 12 34 56 78) ou les adresses email (jean.dupont@email.com = Jean.Dupont@Email.com).
+* **Fuzzy (Flou) :** Utilise un algorithme de similarité pour repérer les fautes de frappe ou les variations. (ex: "Jean-Baptiste" et "J. Baptiste", ou "Dupont" et "Dupon").
+
+> **Exemple d'une bonne stratégie de Match Rules :**
+> * **Règle 1 :** `Party Identification Exact` (Si l'ID du client externe est le même, c'est la même personne).
+> * *OU* **Règle 2 :** `Email Normalized` ET `First Name Exact`.
+> * *OU* **Règle 3 :** `Phone Normalized` ET `Last Name Fuzzy`.
+> 
+> 
+
+### 3. Configurer les "Reconciliation Rules" (Règles de Réconciliation)
+
+Maintenant que Data Cloud sait que "Jean Dupont" (du CRM) et "Jeannot D." (du site web) sont la même personne, une nouvelle question se pose : **Quel prénom doit-on afficher sur le Profil Unifié final ?**
+
+C'est le rôle des règles de réconciliation. Vous les configurez champ par champ (ou pour tous les champs d'un coup). Vous avez trois logiques au choix :
+
+* **Source Sequence (Priorité de la source) :** C'est la méthode la plus utilisée. Vous classez vos systèmes du plus fiable au moins fiable.
+* *Exemple :* 1. Salesforce CRM (très fiable), 2. Service Cloud, 3. Inscription Web (déclaratif, moins fiable). Si le CRM contient un prénom, c'est lui qui gagne. Sinon, on regarde le système 2, etc.
+
+
+* **Most Frequent (Le plus fréquent) :** Data Cloud choisit la valeur qui apparaît le plus souvent dans toutes vos sources de données.
+* *Exemple :* Si 3 systèmes disent "Jean" et 1 système dit "Jeannot", "Jean" l'emporte.
+
+
+* **Last Updated (Le plus récent) :** On garde la donnée la plus fraîche, peu importe le système d'où elle vient. Très utile pour l'adresse postale ou le numéro de téléphone.
+
+### 4. Exécuter et Analyser (Consolidation Rate)
+
+Une fois vos règles enregistrées, vous lancez le calcul (qui sera ensuite automatisé).
+
+Data Cloud va vous fournir une métrique clé : le **Consolidation Rate (Taux de consolidation)**.
+
+* Si vous aviez 1 million de profils sources et que vous obtenez 800 000 profils unifiés, votre taux de consolidation est de 20 %.
+* *Note d'expert :* Si votre taux est de 80 %, vos règles de correspondance (Match Rules) sont probablement trop agressives (trop "Fuzzy") et vous êtes en train de fusionner des homonymes qui ne devraient pas l'être.
+
+---
+
+Maintenant que nous avons ce "Profil Unifié" parfait et dédoublonné, voulez-vous que nous regardions **comment créer un Segment (une audience cible)** à partir de ces données, ou préférez-vous comprendre comment créer un **Calculated Insight** (comme la Valeur à Vie du Client) pour enrichir ce profil ?
+
+---
+C'est là que tout le travail effectué en amont prend son sens ! La segmentation dans Data Cloud, c'est le moment où le profil unifié se transforme en un puissant levier d'action pour le marketing, les ventes ou le service client.
+
+L'avantage majeur de Data Cloud, c'est que son outil de création de segments (le *Segment Builder*) est visuel. Il fonctionne par "glisser-déposer" (drag-and-drop), ce qui permet aux équipes métiers de créer des audiences complexes sans avoir à écrire une seule ligne de code SQL.
+
+Pour tirer pleinement parti de ce Profil Unifié, voici les **4 stratégies de segmentation** (ou piliers) que vous pouvez combiner :
+
+### 1. La Segmentation Démographique et Déclarative (Le "Qui")
+
+C'est la base de votre ciblage. Ces données proviennent directement des attributs du *Profil Unifié* (Unified Individual).
+
+* **Exemples de critères :** Âge, sexe, code postal, statut de fidélité, canal de communication préféré, consentement RGPD.
+* **Le cas d'usage :** "Je veux cibler tous les clients membres du programme de fidélité 'Gold' qui habitent en région parisienne et qui ont accepté d'être contactés par SMS."
+
+### 2. La Segmentation Transactionnelle (Le "Combien")
+
+Ici, nous n'interrogeons plus seulement le profil, mais ses objets associés (les commandes). C'est là que les **Calculated Insights** (que nous avons évoqués plus tôt) entrent en jeu.
+
+* **Exemples de critères :** Valeur à Vie du Client (CLTV), panier moyen, date du dernier achat, catégorie de produits la plus achetée.
+* **Le cas d'usage :** "Je veux cibler les clients dont la CLTV est supérieure à 1 500 € (Insight calculé) ET qui n'ont rien acheté au cours des 6 derniers mois."
+
+### 3. La Segmentation Comportementale (Le "Comment")
+
+C'est ici que l'hyper-personnalisation commence. On utilise les données d'engagement ingérées en temps réel (via les flux web/mobile ou Marketing Cloud).
+
+* **Exemples de critères :** Ouvertures d'e-mails, clics, visites sur une page web spécifique, ajouts au panier abandonnés, appels récents au service client.
+* **Le cas d'usage :** "Je veux cibler les clients qui ont visité la page 'Nouvelle Collection Hiver' plus de 3 fois cette semaine (Streaming Insight) MAIS qui n'ont pas converti."
+
+### 4. La Segmentation Prédictive (Le "Et demain ?")
+
+Grâce à Salesforce Einstein (ou à vos propres modèles d'IA via *Einstein Studio*), vous ne regardez plus le passé, mais le futur.
+
+* **Exemples de critères :** Score de risque de désabonnement (Churn risk), probabilité d'ouverture d'un e-mail, propension à acheter une catégorie de produit.
+* **Le cas d'usage :** "Je veux exclure de ma campagne promotionnelle massive tous les clients ayant une 'Propension à acheter' supérieure à 90 % (car ils achèteront de toute façon, inutile de leur offrir un code promo)."
+
+---
+
+### 💡 La puissance des "Attributs Associés" (Related Attributes)
+
+C'est une fonctionnalité technique mais cruciale de Data Cloud. Souvent, la donnée dont vous avez besoin ne se trouve pas sur le profil du client, mais à plusieurs niveaux de profondeur.
+
+Data Cloud vous permet de naviguer dans le modèle de données :
+
+> *Profil Unifié ➡️ Commande ➡️ Ligne de Commande ➡️ Produit ➡️ Catégorie de Produit.*
+
+Vous pouvez ainsi créer une règle très fine, par exemple : *"Trouve-moi tous les profils unifiés qui ont au moins une commande, contenant au moins une ligne de commande, dont le produit appartient à la catégorie 'Chaussures de running', achetée avec une remise de plus de 20 %."*
+
+---
+
+Maintenant que vous avez créé cette audience hyper-ciblée, la prochaine étape logique est de l'utiliser.
+
+Souhaitez-vous que nous explorions **les "Activations" (comment envoyer ce segment vers Marketing Cloud ou Facebook Ads)**, ou préférez-vous voir comment utiliser les **"Data Actions" pour alerter un commercial dans Sales Cloud en temps réel** lorsqu'un client entre dans ce segment ?
