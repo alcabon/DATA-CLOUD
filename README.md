@@ -383,3 +383,51 @@ Puisque le Data Space est virtuel, sa localisation physique est en réalité **l
 ---
 
 Souhaitez-vous que nous abordions **un cas d'usage pratique justifiant la création de plusieurs Data Spaces** (par exemple, la séparation entre une activité B2B et B2C), ou préférez-vous que nous reprenions notre exploration sur **les méthodes d'Activation de vos segments** vers l'extérieur ?
+
+---
+
+C'est le cas d'usage parfait pour illustrer l'utilité des Data Spaces ! Séparer les activités **B2B** (Business-to-Business) et **B2C** (Business-to-Consumer) est l'une des raisons les plus fréquentes pour lesquelles les architectes Salesforce mettent en place cette ségrégation logique.
+
+Mélanger ces deux mondes dans un seul espace de travail crée souvent un chaos conceptuel et technique. Voici pourquoi, et comment les Data Spaces résolvent ce problème.
+
+---
+
+### 1. Le problème : Pourquoi ne pas tout mettre au même endroit ?
+
+Les modèles de données et les comportements d'achat en B2B et B2C sont fondamentalement différents :
+
+* **L'entité centrale n'est pas la même :** En B2C, le cœur du modèle est l'**Individu** (une personne physique). En B2B, le cœur du modèle est le **Compte** (une entreprise), auquel sont rattachés des contacts.
+* **Les règles de dédoublonnage diffèrent :** En B2C, deux personnes avec la même adresse e-mail personnelle (`jean.dupont@gmail.com`) sont probablement la même personne. En B2B, deux contacts avec le même nom de domaine d'entreprise (`@acme.com`) ne sont *pas* la même personne, mais des collègues appartenant au même Compte.
+* **La gouvernance :** Vos équipes marketing B2C ne doivent pas nécessairement avoir accès aux contrats confidentiels de vos grands comptes B2B, et vice versa.
+
+### 2. La solution : Une architecture à deux Data Spaces
+
+Dans Data Cloud, vous allez créer deux espaces distincts : **Data Space B2C** et **Data Space B2B**. Voici comment ils vont se comporter de manière autonome.
+
+#### 🏢 Data Space 1 : "Consumer" (B2C)
+
+* **Sources connectées :** Votre site e-commerce, votre application mobile, et les données de Service Cloud pour le support client grand public.
+* **Modélisation :** Tout est centré sur le profil *Individual*.
+* **Identity Resolution :** Les règles fusionnent les profils en se basant sur les numéros de téléphone portable, les e-mails personnels et les identifiants de compte e-commerce.
+* **Insights calculés :** Vous calculez le Panier Moyen par client, la probabilité d'ouverture d'un e-mail promotionnel, ou le risque d'abandon de panier.
+
+#### 🏭 Data Space 2 : "Enterprise" (B2B)
+
+* **Sources connectées :** Sales Cloud (Pistes, Comptes, Opportunités), votre système de facturation ERP, et LinkedIn Lead Gen.
+* **Modélisation :** Le focus est mis sur l'objet *Account* et ses *Contacts* associés.
+* **Identity Resolution :** Les règles associent les contacts à des entreprises en se basant sur les noms de domaine des e-mails professionnels (ex: tout ce qui finit par `@entreprise.fr` va vers le même compte) ou sur le numéro de SIRET.
+* **Insights calculés :** Vous calculez le Chiffre d'Affaires annuel par Compte, le délai moyen de clôture d'une opportunité, ou le score de santé global de l'entreprise.
+
+---
+
+### 3. Les bénéfices de cette séparation
+
+> **Pertinence des audiences :** Quand le marketeur B2C se connecte à Data Cloud, il ne voit que des segments pertinents pour lui ("Acheteurs compulsifs", "Inactifs depuis 30 jours"). Il n'est pas pollué par des segments B2B du type "Comptes du secteur industriel".
+> **Sécurité et conformité :** Le cloisonnement logique garantit qu'une erreur de ciblage ne mélangera jamais vos clients particuliers avec vos partenaires commerciaux stratégiques.
+> **Performance du système :** Les moteurs de calcul (Identity Resolution et Insights) tournent plus vite car ils ne traitent que les données pertinentes pour leur contexte spécifique, sans avoir à filtrer la moitié de la base de données à chaque opération.
+
+---
+
+Maintenant que vos données sont parfaitement structurées, unifiées et sécurisées dans leurs espaces respectifs, nous pouvons passer à la phase d'action.
+
+Souhaitez-vous que nous explorions **les Activations** (comment envoyer une audience B2C vers Meta/Facebook Ads) ou préférez-vous voir le fonctionnement des **Data Actions** (comment alerter un commercial B2B en temps réel dans Salesforce lorsqu'un compte clé visite votre page de tarifs) ?
