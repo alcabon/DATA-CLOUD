@@ -144,3 +144,86 @@ L'avantage de respecter ce modèle canonique au lieu de créer vos propres table
 Maintenant que le fonctionnement de ce modèle relationnel est clair, nous avons deux voies techniques très intéressantes à explorer.
 
 Souhaitez-vous que nous abordions **les flux d'Ingestion API** (comment un développeur pousse des données en temps réel dans ces tables) ou préférez-vous découvrir **comment déclencher des automatisations avec les Data Actions** (par exemple, envoyer une alerte dans Slack ou Salesforce dès qu'un client VIP crée un ticket de support) ?
+
+---
+
+Excellent choix ! Passer de la lecture (Query API) à l'écriture (Ingestion API) est l'étape ultime pour rendre votre Data Cloud véritablement "vivant" et réactif.
+
+Lorsqu'il s'agit de systèmes externes personnalisés (une application mobile sur mesure, un vieux système de caisse en magasin, ou un portail web spécifique) pour lesquels il n'existe pas de connecteur natif, l'**Ingestion API** est la porte d'entrée incontournable.
+
+Voici comment un développeur orchestre ce flux de données, étape par étape, et les pièges architecturaux à éviter.
+
+---
+
+### 1. Les deux "saveurs" de l'Ingestion API
+
+En tant que développeur, vous avez le choix entre deux méthodes d'ingestion, selon votre cas d'usage :
+
+* **Streaming API (Flux en continu) :** C'est le mode temps réel (ou quasi temps réel). Vous l'utilisez pour envoyer de petits paquets de données (micro-batches) très fréquemment.
+* *Cas d'usage :* Un utilisateur clique sur "Ajouter au panier" sur votre site web, ou met à jour son profil sur votre application mobile. L'application envoie immédiatement le payload JSON.
+
+
+* **Bulk API (Traitement par lots) :** C'est la méthode "lourde". Conçue pour ingérer des millions de lignes d'un coup.
+* *Cas d'usage :* Le chargement initial historique de vos 10 dernières années de ventes, ou une synchronisation nocturne massive avec un vieil ERP. Les données sont envoyées sous forme de fichiers CSV via des "Jobs" (tâches).
+
+
+
+### 2. Le Prérequis : Le Contrat de Données (Schema)
+
+Contrairement à un Data Lake totalement anarchique où l'on pourrait jeter n'importe quel fichier JSON, Data Cloud exige un **contrat strict** avant d'accepter la moindre donnée.
+
+1. L'administrateur Salesforce va dans l'interface de Data Cloud et crée une nouvelle source de type **"Ingestion API"**.
+2. Il doit y uploader un **Schéma au format OpenAPI (YAML ou JSON)**. Ce fichier décrit exactement à quoi va ressembler la donnée que le développeur va envoyer (le nom des champs, s'il s'agit de texte, de nombres, de dates, et surtout, quel champ est la **Clé Primaire**).
+3. Data Cloud crée alors automatiquement l'objet réceptacle brut (le fameux **DLO - Data Lake Object**) basé sur ce schéma.
+
+### 3. L'Appel API (Exemple avec le Streaming)
+
+Une fois l'authentification (OAuth 2.0) gérée, le développeur va cibler un endpoint spécifique qui contient le nom de son connecteur et le nom de l'objet défini dans le schéma.
+
+**Endpoint :**
+`POST /api/v1/ingest/sources/MonSiteWeb/objects/VisiteurWeb`
+
+**Le Payload (Corps de la requête) :**
+Le développeur peut envoyer plusieurs enregistrements d'un coup (jusqu'à 100 enregistrements ou 200 Ko par appel en Streaming).
+
+```json
+{
+  "data": [
+    {
+      "IdSession": "sess-8899",
+      "EmailClient": "jean.dupont@email.com",
+      "Action": "AjoutPanier",
+      "DateEvenement": "2026-02-13T20:40:00.000Z"
+    },
+    {
+      "IdSession": "sess-9900",
+      "EmailClient": "marie.c@email.com",
+      "Action": "PageVue",
+      "DateEvenement": "2026-02-13T20:41:05.000Z"
+    }
+  ]
+}
+
+```
+
+La réponse de l'API sera un code `202 Accepted`, signifiant que Data Cloud a bien reçu le paquet.
+
+---
+
+### 4. ⚠️ Le Secret de l'Architecte : L'Asynchronisme et l'Upsert
+
+C'est ici que de nombreux développeurs habitués aux bases de données SQL classiques se font surprendre :
+
+> **L'Upsert automatique (Mise à jour ou Insertion) :**
+> Vous n'avez pas besoin de faire de requête `UPDATE`. L'Ingestion API fonctionne exclusivement en mode "Upsert" basé sur la Clé Primaire définie dans votre schéma.
+> Si vous renvoyez un JSON avec un `IdSession` qui existe déjà, Data Cloud écrasera l'ancienne ligne. Si l'ID est nouveau, il créera une nouvelle ligne.
+
+> **C'est un processus Asynchrone :**
+> Quand l'API renvoie le statut `202 Accepted`, cela veut dire que la donnée est *entrée* dans la file d'attente de la plateforme. Elle va atterrir dans le **DLO**. Ensuite, le moteur de Data Cloud va prendre le relais en arrière-plan pour exécuter le mapping et transformer ce DLO en **DMO** (l'objet harmonisé), puis potentiellement mettre à jour le **Profil Unifié**.
+> *Conclusion :* Si vous envoyez une donnée via l'Ingestion API, et que vous faites un `SELECT` via la Query API la milliseconde suivante, vous ne la verrez pas encore. Il y a un léger délai de traitement natif à l'architecture Big Data.
+
+---
+
+Maintenant que vos développeurs injectent des comportements clients en temps réel (comme l'ajout au panier) dans Data Cloud, c'est le moment idéal pour exploiter cette réactivité !
+
+Souhaitez-vous que nous explorions **les Data Actions** pour voir comment déclencher automatiquement un événement dans Salesforce CRM (ex: créer une tâche pour relancer le client) dès que cette donnée d'abandon de panier arrive via l'API ?
