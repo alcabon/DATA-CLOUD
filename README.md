@@ -44,3 +44,19 @@ Pourquoi les entreprises investissent-elles massivement dans Data Cloud pour ré
 ---
 
 Souhaitez-vous que nous explorions **un cas d'usage spécifique** pour illustrer cela (par exemple, comment le Marketing et le Service Client collaborent grâce à Data Cloud) ou préférez-vous aborder **les aspects plus techniques de l'intégration des données** ?
+
+---
+
+Voici une illustration qui représente visuellement la relation entre Salesforce Data Cloud (le moteur) et la vision Customer 360, en y intégrant des éléments extérieurs pour montrer le flux de données et son impact dans le monde réel.
+
+[Image: Une infographie futuriste illustrant Salesforce Data Cloud et Customer 360. À gauche, un cerveau numérique étiqueté "SALESFORCE DATA CLOUD" ingère des données provenant de diverses sources externes comme des satellites ("EXTERNAL DATA"), des serveurs ("LEGACY SYSTEMS"), des téléphones ("MOBILE & SOCIAL") et des flux e-commerce. À l'intérieur, les données sont harmonisées en un "HARMONIZED CUSTOMER PROFILE". Un flux d'énergie relie ce cerveau à un cercle central étiqueté "CUSTOMER 360", où les différentes applications Salesforce (Sales, Service, Marketing, Commerce Cloud) entourent un profil client unique. De ce cercle, des actions sont projetées dans une ville futuriste en arrière-plan : une publicité personnalisée sur un panneau, un drone de livraison, une voiture connectée, et un agent de service utilisant un tableau de bord unifié.]
+
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/a8858af6-7859-44b0-be4b-3458bcab787a" />
+
+
+J'ai conçu cette image pour qu'elle soit à la fois claire sur le plan conceptuel et visuellement riche :
+
+* **Data Cloud comme "cerveau" :** Il est au centre, collectant et traitant intelligemment les données brutes pour créer un profil harmonisé.
+* **Sources externes variées :** Des éléments comme le satellite ou les serveurs hérités montrent que Data Cloud connecte *tout*, pas seulement les données Salesforce.
+* **Customer 360 comme résultat :** Le cercle unifié montre comment cette intelligence est distribuée à toutes les équipes (Ventes, Service, etc.) pour une vue cohérente.
+* **Impact dans le monde réel :** La ville en arrière-plan illustre les résultats concrets : des offres personnalisées, des services proactifs et des expériences connectées pour le client final.
