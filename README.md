@@ -431,3 +431,6 @@ Dans Data Cloud, vous allez créer deux espaces distincts : **Data Space B2C** e
 Maintenant que vos données sont parfaitement structurées, unifiées et sécurisées dans leurs espaces respectifs, nous pouvons passer à la phase d'action.
 
 Souhaitez-vous que nous explorions **les Activations** (comment envoyer une audience B2C vers Meta/Facebook Ads) ou préférez-vous voir le fonctionnement des **Data Actions** (comment alerter un commercial B2B en temps réel dans Salesforce lorsqu'un compte clé visite votre page de tarifs) ?
+
+---
+
