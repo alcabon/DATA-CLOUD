@@ -95,3 +95,45 @@ L'intégration Zero Copy entre Salesforce et Snowflake fonctionne dans les deux 
 Maintenant que vous comprenez comment Data Cloud peut virtuellement "absorber" les données de tout votre système d'information de manière transparente, vers quoi souhaitez-vous vous diriger ?
 
 Nous pouvons aborder **Einstein Studio (BYOM)** pour voir comment utiliser des modèles d'Intelligence Artificielle développés dans Snowflake/Databricks directement sur ces données, ou nous pencher sur la façon dont les développeurs utilisent la **Query API (SQL)** pour interroger tout ce système !
+
+---
+
+C'est la question centrale que se posent tous les professionnels de la data qui arrivent dans l'écosystème Salesforce !
+
+Pour vous répondre directement : **Salesforce a effectivement abstrait 95 % de cette complexité derrière des interfaces graphiques (point-and-click).** Cependant, connaître ces concepts sous-jacents (Iceberg, Parquet, Snowflake) est un **immense avantage stratégique** qui fera la différence entre un bon administrateur et un véritable Architecte Data Cloud.
+
+Voici comment cette dualité s'exprime dans la réalité des projets :
+
+### 1. La promesse Salesforce : L'abstraction par le "Point-and-Click"
+
+Si vous êtes un utilisateur métier (Marketeur), un Data Analyst, ou même un Administrateur Salesforce standard, vous n'écrirez jamais une ligne de code Iceberg et vous ne manipulerez jamais de fichiers Parquet.
+
+* **La configuration Zero Copy :** Pour connecter Snowflake, l'interface de Data Cloud vous demande simplement de cliquer sur "Nouveau Data Stream", de choisir "Snowflake", de saisir vos identifiants (ou de sélectionner le partage préconfiguré) et de cocher les tables que vous voulez voir. Tout le reste (la traduction Iceberg, la création des objets virtuels) est géré de manière invisible par le moteur.
+* **La création de requêtes :** Comme nous l'avons vu pour la segmentation, vous glissez-déposez des blocs. Salesforce génère le SQL complexe et gère le "compute pushdown" vers Snowflake en arrière-plan.
+
+> **En résumé :** Vous pouvez tout à fait certifier et déployer Data Cloud sans jamais prononcer les mots "Apache Iceberg".
+
+---
+
+### 2. Pourquoi connaître ces technologies est un "Super-Pouvoir" (Le rôle de l'Architecte)
+
+Si l'interface est simple, la machinerie en dessous reste de l'ingénierie Big Data pure et dure. Comprendre Snowflake, Parquet et Iceberg devient indispensable dès que vous sortez des cas d'usage basiques, pour trois raisons majeures :
+
+* **⚙️ L'optimisation des performances (Le format Parquet) :**
+Parquet est un format orienté *colonne*. Si vous savez cela, vous comprenez pourquoi créer un Segment basé sur une seule colonne (ex: "Statut = Actif") sur 100 millions de lignes prendra 2 secondes, alors qu'une requête qui tente d'afficher *toutes* les colonnes de ces 100 millions de lignes mettra le système à genoux. Cela change la façon dont vous modélisez vos données (les DMO).
+* **🔧 Le Troubleshooting (Débogage réseau et permissions) :**
+Quand la connexion "Zero Copy" avec Snowflake échoue, le message d'erreur dans Salesforce peut être générique. Si vous connaissez Snowflake, vous saurez vérifier du côté de Snowflake si le *Secure Share* est bien configuré, si les *Grants* (permissions) sont corrects sur les bases de données, et si le *Virtual Warehouse* assigné n'est pas suspendu.
+* **💰 La gestion des coûts (Le Compute Pushdown) :**
+Dans une architecture fédérée (Zero Copy), c'est Snowflake qui fait le calcul, pas Salesforce. Or, dans Snowflake, vous payez à la seconde de calcul (les fameux "Crédits"). Un architecte qui comprend comment la requête est envoyée depuis Data Cloud pourra éviter de configurer des *Calculated Insights* aberrants qui tourneraient toutes les heures et feraient exploser la facture Snowflake du client.
+
+---
+
+### Le verdict de l'expert
+
+Si vous venez du monde CRM (Salesforce traditionnel), l'interface graphique vous permettra d'être opérationnel très vite. Mais pour exceller, je vous conseille vivement de lire les concepts de base des **Data Lakehouses** et de l'architecture de **Snowflake**.
+
+Si vous venez du monde Data (Data Engineer, Snowflake admin), vous avez un avantage massif : il vous suffit d'apprendre l'interface de Data Cloud, car vous maîtrisez déjà les lois physiques qui régissent les données en arrière-plan !
+
+---
+
+Pour illustrer comment un profil un peu plus technique peut "casser" cette abstraction volontairement, souhaitez-vous que nous regardions comment utiliser la **Query API** (pour écrire vos propres requêtes SQL complexes directement sur le Data Lake) ou préférez-vous découvrir **Einstein Studio** (pour connecter vos propres modèles de Machine Learning) ?
