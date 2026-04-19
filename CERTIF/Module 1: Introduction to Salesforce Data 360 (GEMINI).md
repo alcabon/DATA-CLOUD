@@ -59,6 +59,8 @@ Instead, utilize the modern, standard roles:
 
 *Note on Legacy Roles: If you are auditing an older org, you may see roles like "Data Aware Specialist" or "Marketing Admin." These are now considered legacy. While they still function, Salesforce does not update them with new feature access, and users should be migrated to the Architect or Activation roles.*
 
+https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5
+
 ---
 
 ### 🛠️ Hands-on Lab: Navigating the Interface and Assigning Permissions (Updated)
